@@ -26,7 +26,7 @@ function sendReminderEmails() {
       // Calculate 2 weeks before appointment
       const reminderTimestamp = date.getTime() - (3.6e6 * 24);
       
-      // Check if current date is within 2 weeks before appointment
+      // Check if current date is within 1 day before appointment
       if (Date.now() > reminderTimestamp) {
         let message = messages[messageType]
           .replace("C#", vaccine)
