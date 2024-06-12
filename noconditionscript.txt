@@ -1,0 +1,39 @@
+function sendReminderEmailsNoConditions() {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  
+  // Get the "datas" sheet
+  const dataSheet = spreadsheet.getSheetByName("datas");
+  const dataRange = dataSheet.getRange(2, 1, dataSheet.getLastRow() - 1, 7);
+  const data = dataRange.getValues();
+  
+  // Get the "Messages" sheet
+  const messageSheet = spreadsheet.getSheetByName("Messages");
+  const messageRange = messageSheet.getRange(2, 1, messageSheet.getLastRow() - 1, 2);
+  const messages = messageRange.getValues().reduce((acc, val) => {
+    if (val[0]) {
+      acc[val[0]] = val[1];
+    }
+    return acc;
+  }, {});
+  
+  // Iterate over each row and send emails regardless of the conditions
+  for (let i = 0; i < data.length; i++) {
+    const [name, email, vaccine, dateStr, time, messageType, emailSent] = data[i];
+    const date = new Date(dateStr);
+    
+    // Check if email has already been sent
+    if (!emailSent && messageType && messages[messageType]) {
+      let message = messages[messageType]
+        .replace("C#", vaccine)
+        .replace("D#", date.toLocaleDateString())
+        .replace("E#", time);
+      
+      // Send email
+      GmailApp.sendEmail(email, "Appointment Reminder", message);
+      
+      // Mark the email as sent
+      dataSheet.getRange(i + 2, 7).setValue(true);
+      Logger.log(`Email sent to ${email}.`);
+    }
+  }
+}
