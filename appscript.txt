@@ -24,7 +24,7 @@ function sendReminderEmails() {
     // Check conditions: email not sent and valid message type
     if (!emailSent && messageType && messages[messageType]) {
       // Calculate 2 weeks before appointment
-      const reminderTimestamp = date.getTime() - (3.6e6 * 24 * 14);
+      const reminderTimestamp = date.getTime() - (3.6e6 * 24);
       
       // Check if current date is within 2 weeks before appointment
       if (Date.now() > reminderTimestamp) {
