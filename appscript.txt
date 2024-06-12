@@ -1,0 +1,56 @@
+/*
+ * This script sends reminder emails to people based on data stored in a Google Sheet.
+ * It sends emails 2 weeks before their appointment date and marks the email as sent.
+ * The script can be set to run automatically on a daily basis using a time-driven trigger.
+ */
+
+function sendReminderEmails() {
+  // Get the active Google Spreadsheet and the specific sheet by name
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName("Sheet1"); // Replace "Sheet1" with your actual sheet name
+
+  // Define the range of data to be read from the sheet
+  // The data starts from the second row, first column, and spans 7 columns (Name, Email, Vaccine, Date, Time, Message Type, Email Sent)
+  const dataRange = sheet.getRange(2, 1, sheet.getLastRow() - 1, 7);
+  const data = dataRange.getValues(); // Get all data in this range
+
+  // Fetch the message templates from the specified range
+  // Message types and their corresponding messages are in columns I and J
+  const messageTypeRange = sheet.getRange("I2:J10"); // Adjust this range based on your actual data layout
+  const messageTypes = messageTypeRange.getValues().reduce((acc, val) => {
+    if (val[0]) {
+      acc[val[0]] = val[1]; // Store message type and its message in an object for easy lookup
+    }
+    return acc;
+  }, {});
+
+  // Iterate over each row of data
+  for (let i = 0; i < data.length; i++) {
+    // Destructure the row data into individual variables
+    const [name, email, vaccine, dateStr, time, messageType, emailSent] = data[i];
+    const date = new Date(dateStr); // Convert the date string to a Date object
+
+    // Check if the email has not been sent yet and there is a valid message type
+    if (!emailSent && messageType && messageTypes[messageType]) {
+      // Calculate the timestamp for 2 weeks before the appointment date
+      const reminderTimestamp = date.getTime() - (3.6e6 * 24 * 14); // 3.6e6 is milliseconds per hour, 24 hours, 14 days
+
+      // Check if the current date is past the reminder timestamp (i.e., within 2 weeks before the appointment)
+      if (Date.now() > reminderTimestamp) {
+        // Replace placeholders in the message template with actual data
+        // C#: Vaccine, D#: Date, E#: Time
+        let message = messageTypes[messageType]
+          .replace("C#", vaccine)
+          .replace("D#", date.toLocaleDateString())
+          .replace("E#", time);
+
+        // Send the email with the personalized message
+        GmailApp.sendEmail(email, "Appointment Reminder", message);
+
+        // Mark the email as sent in the sheet
+        sheet.getRange(i + 2, 7).setValue(true); // i + 2 to account for header row and zero-based index
+        Logger.log(`Email sent to ${email}.`);
+      }
+    }
+  }
+}
