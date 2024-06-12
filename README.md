@@ -1,48 +1,50 @@
 # Appointment Reminder Email Script
 
-This script is designed to send reminder emails to people based on appointment data stored in a Google Sheet. The script reads the data from the sheet, checks if reminder emails need to be sent, and sends personalized emails to the respective recipients.
+This script sends reminder emails to people based on appointment data stored in a Google Sheet. It reads the data from two separate sheets - one containing the appointment details, and another containing the email message templates.
 
-## How it works
+## How it works 
 
-1. The script starts by accessing the active Google Spreadsheet and the specific sheet containing the appointment data.
+1. The script accesses the active Google Spreadsheet.
 
-2. It defines the range of data to be read from the sheet, which includes columns for Name, Email, Vaccine, Date, Time, Message Type, and Email Sent status.
+2. It gets the "datas" sheet containing the appointment details.
 
-3. The script then fetches the message templates from a separate range in the sheet. These templates are stored with their corresponding message types.
+3. The appointment data is read from the 2nd row onwards, spanning 7 columns - Name, Email, Vaccine, Date, Time, Message Type, Email Sent. 
 
-4. It iterates over each row of appointment data in the sheet.
+4. The script then accesses the "Messages" sheet containing the email templates. 
 
-5. For each row, the script checks if an email has already been sent and if there is a valid message type associated with the appointment.
+5. The message templates are mapped to their corresponding message types for easy lookup later.
 
-6. If the conditions are met, the script calculates the timestamp for 2 weeks before the appointment date.
+6. The script iterates through each appointment data row. 
 
-7. If the current date is within 2 weeks of the appointment, the script proceeds to send a reminder email.
+7. For each row, it checks if a reminder email has already been sent for that appointment. 
 
-8. It personalizes the email message by replacing placeholders in the template with actual appointment details such as Vaccine, Date, and Time.
+8. It also checks if there is a valid message type defined for that appointment.
 
-9. The script sends the personalized email to the recipient using the email address specified in the sheet.
+9. If above conditions are met, it calculates the date timestamp for 2 weeks before the appointment.
 
-10. After sending the email, the script marks the "Email Sent" column as true for that particular row in the sheet.
+10. If current date falls within 2 weeks of appointment, the script sends a reminder email.
 
-11. The script logs a message indicating that the email has been sent to the recipient.
+11. It replaces placeholders in the template with actual data - Vaccine, Date, Time. 
+
+12. Email is sent to the address specified in the "datas" sheet.
+
+13. That row is marked as email sent in the sheet after sending email.
+
+14. The script logs confirmation that the email has been sent successfully.
 
 ## Automation
 
-This script can be set to run automatically on a daily basis using a time-driven trigger in Google Apps Script. This ensures that reminder emails are sent consistently without manual intervention.
+The script can be automated to run daily using time-driven triggers in Apps Script.
 
 ## Prerequisites
 
-To use this script, you need:
+- Google account 
+- Google Sheet with "datas" and "Messages" sheets
+- "datas" sheet should have the necessary appointment columns
+- Templates defined in "Messages" sheet
 
-- A Google account
-- Access to Google Sheets and the specific sheet containing the appointment data
-- The sheet should have columns for Name, Email, Vaccine, Date, Time, Message Type, and Email Sent
-- Message templates should be defined in a separate range within the sheet, with message types and their corresponding messages
+## Notes
 
-## Note
+- Appointment data starts from 2nd row
+- Adjust sheet names and ranges as per your data
 
-Make sure to replace "Sheet1" in the script with the actual name of your sheet.
-
-Adjust the range for message templates based on your sheet's layout.
-
-The script assumes that the appointment data starts from the second row of the sheet.
